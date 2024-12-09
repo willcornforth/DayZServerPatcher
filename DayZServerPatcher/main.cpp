@@ -27,28 +27,26 @@ std::vector<char> fileToBuffer(const std::string& filePath) {
     std::ifstream file(filePath, std::ios::binary);
     std::vector<char> buffer;
 
-    if (file.is_open()) {
-        // Create buffer the size of the input file.
-        file.seekg(0, std::ios::end);
-        std::streamsize fileSize = file.tellg();
-        file.seekg(0, std::ios::beg);
-        buffer.resize(fileSize);
-
-        if (file.read(buffer.data(), fileSize)) {
-            std::cout << "[+] File Size 0x" << std::hex << fileSize << std::endl;
-            file.close();
-
-            return buffer;
-        }
-        else {
-            std::cerr << "[-] Failed to read file. File size: " << fileSize << std::endl;
-            return buffer;
-        }
-    }
-    else {
+    if (!file.is_open()) {
         std::cerr << "[-] Failed to open file. Path: " << filePath << std::endl;
         return buffer;
     }
+
+    // Create buffer the size of the input file.
+    file.seekg(0, std::ios::end);
+    std::streamsize fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    buffer.resize(fileSize);
+
+    if (!file.read(buffer.data(), fileSize)) {
+        std::cerr << "[-] Failed to read file. File size: " << fileSize << std::endl;
+        return buffer;
+    }
+
+    std::cout << "[+] File Size 0x" << std::hex << fileSize << std::endl;
+    file.close();
+
+    return buffer;
 }
 
 bool bufferToFile(std::vector<char>& buffer, std::string filePath) {
